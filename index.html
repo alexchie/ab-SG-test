@@ -47,6 +47,123 @@
             border-radius: 15px;
         }
 
+        .store-map-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+        }
+
+        .store-map-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 0;
+            width: 90%;
+            max-width: 800px;
+            border-radius: 15px;
+            overflow: hidden;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .store-map-header {
+            background: #000;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .store-map-header h3 {
+            margin: 0;
+        }
+
+        .store-map-close {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .store-map-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .store-filter {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .store-filter select {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .store-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .store-item {
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .store-item:hover {
+            border-color: #000;
+            background: #f5f5f5;
+            transform: translateX(5px);
+        }
+
+        .store-item h4 {
+            margin: 0 0 8px 0;
+            color: #000;
+        }
+
+        .store-item p {
+            margin: 4px 0;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .store-type-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .badge-711 {
+            background: #ff6b1a;
+            color: white;
+        }
+
+        .badge-family {
+            background: #00a650;
+            color: white;
+        }
+
         .category-nav button {
             background: white;
             border: 2px solid #e0e0e0;
@@ -367,6 +484,31 @@
         <div class="products-grid" id="productsGrid"></div>
     </div>
 
+    
+    <!-- 門市地圖選擇 Modal -->
+    <div id="storeMapModal" class="store-map-modal">
+        <div class="store-map-content">
+            <div class="store-map-header">
+                <h3>選擇取貨門市</h3>
+                <button class="store-map-close" onclick="closeStoreMap()">&times;</button>
+            </div>
+            <div class="store-map-body">
+                <div class="store-filter">
+                    <select id="filterCity" onchange="filterStores()">
+                        <option value="">所有縣市</option>
+                        <option value="台北市">台北市</option>
+                        <option value="新北市">新北市</option>
+                        <option value="桃園市">桃園市</option>
+                        <option value="台中市">台中市</option>
+                        <option value="台南市">台南市</option>
+                        <option value="高雄市">高雄市</option>
+                    </select>
+                </div>
+                <div class="store-list" id="storeList"></div>
+            </div>
+        </div>
+    </div>
+
     <div id="cartModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeCart()">&times;</span>
@@ -390,56 +532,32 @@
                 </div>
                 <div class="form-group">
                     <label>配送方式 *</label>
-                    <div style="margin-bottom: 10px;">
-                        <input type="radio" id="delivery711" name="deliveryMethod" value="711" checked>
-                        <label for="delivery711" style="display: inline; font-weight: normal;">7-11 門市取貨</label>
+                    <div style="display: flex; gap: 15px; margin-bottom: 10px;">
+                        <div>
+                            <input type="radio" id="delivery711" name="deliveryMethod" value="711" checked onchange="updateStoreType()">
+                            <label for="delivery711" style="display: inline; font-weight: normal;">🏪 7-11 取貨</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="deliveryFamily" name="deliveryMethod" value="family" onchange="updateStoreType()">
+                            <label for="deliveryFamily" style="display: inline; font-weight: normal;">🏪 全家取貨</label>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="form-group">
-                    <label>取貨縣市 *</label>
-                    <select id="storeCity" required>
-                        <option value="">請選擇縣市</option>
-                        <option value="台北市">台北市</option>
-                        <option value="新北市">新北市</option>
-                        <option value="桃園市">桃園市</option>
-                        <option value="台中市">台中市</option>
-                        <option value="台南市">台南市</option>
-                        <option value="高雄市">高雄市</option>
-                        <option value="基隆市">基隆市</option>
-                        <option value="新竹市">新竹市</option>
-                        <option value="新竹縣">新竹縣</option>
-                        <option value="苗栗縣">苗栗縣</option>
-                        <option value="彰化縣">彰化縣</option>
-                        <option value="南投縣">南投縣</option>
-                        <option value="雲林縣">雲林縣</option>
-                        <option value="嘉義市">嘉義市</option>
-                        <option value="嘉義縣">嘉義縣</option>
-                        <option value="屏東縣">屏東縣</option>
-                        <option value="宜蘭縣">宜蘭縣</option>
-                        <option value="花蓮縣">花蓮縣</option>
-                        <option value="台東縣">台東縣</option>
-                        <option value="澎湖縣">澎湖縣</option>
-                        <option value="金門縣">金門縣</option>
-                        <option value="連江縣">連江縣</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label>7-11 門市名稱 *</label>
-                    <input type="text" id="storeName" placeholder="例如：台北車站門市" required>
-                    <small style="color: #666; font-size: 0.9em;">請至 <a href="https://emap.pcsc.com.tw/" target="_blank" style="color: #0066cc;">7-11 門市查詢</a> 查詢門市資訊</small>
-                </div>
-                
-                <div class="form-group">
-                    <label>門市地址 *</label>
-                    <input type="text" id="storeAddress" placeholder="例如：台北市中正區北平西路3號" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>門市代碼（選填）</label>
-                    <input type="text" id="storeCode" placeholder="例如：123456">
-                    <small style="color: #666; font-size: 0.9em;">如果知道門市代碼可以填寫，不知道可以留空</small>
+                    <label>取貨門市 *</label>
+                    <button type="button" onclick="openStoreMap()" style="width: 100%; padding: 15px; background: #000; color: white; border: none; border-radius: 8px; font-size: 1em; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                        <span>🗺️</span>
+                        <span id="storeButtonText">點擊選擇門市（互動式地圖）</span>
+                    </button>
+                    <input type="hidden" id="selectedStoreId" required>
+                    <input type="hidden" id="selectedStoreName" required>
+                    <input type="hidden" id="selectedStoreAddress" required>
+                    <input type="hidden" id="selectedStoreType" value="711" required>
+                    <div id="selectedStoreInfo" style="margin-top: 10px; padding: 10px; background: #f5f5f5; border-radius: 8px; display: none;">
+                        <p style="margin: 0; font-weight: bold;" id="storeInfoName"></p>
+                        <p style="margin: 5px 0 0 0; color: #666; font-size: 0.9em;" id="storeInfoAddress"></p>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>匯款帳號後五碼 *</label>
@@ -498,7 +616,94 @@
 
         let currentCategory = 'all';
 
+
+        // 模擬門市資料（實際整合時會從綠界 API 取得）
+        const mockStores = {
+            '711': [
+                { id: '991182', name: '台北車站門市', address: '台北市中正區北平西路3號1樓', city: '台北市', type: '711' },
+                { id: '286467', name: '信義威秀門市', address: '台北市信義區松壽路20號', city: '台北市', type: '711' },
+                { id: '130345', name: '西門町門市', address: '台北市萬華區漢中街32號', city: '台北市', type: '711' },
+                { id: '675234', name: '板橋車站門市', address: '新北市板橋區站前路5號', city: '新北市', type: '711' },
+                { id: '432156', name: '中壢車站門市', address: '桃園市中壢區中和路139號', city: '桃園市', type: '711' },
+                { id: '789012', name: '台中車站門市', address: '台中市中區建國路172號', city: '台中市', type: '711' },
+                { id: '234567', name: '台南車站門市', address: '台南市東區北門路二段4號', city: '台南市', type: '711' },
+                { id: '890123', name: '高雄車站門市', address: '高雄市三民區建國二路318號', city: '高雄市', type: '711' }
+            ],
+            'family': [
+                { id: '001632', name: '台北車站店', address: '台北市中正區北平西路3號B1', city: '台北市', type: 'family' },
+                { id: '003916', name: '信義新天地店', address: '台北市信義區松高路12號', city: '台北市', type: 'family' },
+                { id: '005234', name: '西門旗艦店', address: '台北市萬華區漢中街50號', city: '台北市', type: 'family' },
+                { id: '002145', name: '板橋站前店', address: '新北市板橋區縣民大道一段3號', city: '新北市', type: 'family' },
+                { id: '004532', name: '中壢中正店', address: '桃園市中壢區中正路268號', city: '桃園市', type: 'family' },
+                { id: '006789', name: '台中火車站店', address: '台中市東區復興路四段186號', city: '台中市', type: 'family' },
+                { id: '007234', name: '台南站前店', address: '台南市中西區中山路162號', city: '台南市', type: 'family' },
+                { id: '008901', name: '高雄站前店', address: '高雄市三民區建國二段288號', city: '高雄市', type: 'family' }
+            ]
+        };
+
+        function updateStoreType() {
+            const storeType = document.querySelector('input[name="deliveryMethod"]:checked').value;
+            document.getElementById('selectedStoreType').value = storeType;
+            // 清除已選擇的門市
+            document.getElementById('selectedStoreId').value = '';
+            document.getElementById('selectedStoreName').value = '';
+            document.getElementById('selectedStoreAddress').value = '';
+            document.getElementById('selectedStoreInfo').style.display = 'none';
+            document.getElementById('storeButtonText').textContent = '點擊選擇門市（互動式地圖）';
+        }
+
+        function openStoreMap() {
+            document.getElementById('storeMapModal').style.display = 'block';
+            filterStores();
+        }
+
+        function closeStoreMap() {
+            document.getElementById('storeMapModal').style.display = 'none';
+        }
+
+        function filterStores() {
+            const storeType = document.getElementById('selectedStoreType').value;
+            const filterCity = document.getElementById('filterCity').value;
+            const stores = mockStores[storeType] || [];
+            
+            const filteredStores = filterCity 
+                ? stores.filter(s => s.city === filterCity)
+                : stores;
+            
+            const storeList = document.getElementById('storeList');
+            storeList.innerHTML = filteredStores.map(store => `
+                <div class="store-item" onclick="selectStore('${store.id}', '${store.name}', '${store.address}', '${store.type}')">
+                    <span class="store-type-badge badge-${store.type}">
+                        ${store.type === '711' ? '7-ELEVEN' : '全家'}
+                    </span>
+                    <h4>${store.name}</h4>
+                    <p>📍 ${store.address}</p>
+                    <p style="color: #999;">門市代號：${store.id}</p>
+                </div>
+            `).join('');
+            
+            if (filteredStores.length === 0) {
+                storeList.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">此縣市暫無門市資料</p>';
+            }
+        }
+
+        function selectStore(id, name, address, type) {
+            document.getElementById('selectedStoreId').value = id;
+            document.getElementById('selectedStoreName').value = name;
+            document.getElementById('selectedStoreAddress').value = address;
+            document.getElementById('selectedStoreType').value = type;
+            
+            const typeName = type === '711' ? '7-ELEVEN' : '全家';
+            document.getElementById('storeInfoName').textContent = `${typeName} ${name}`;
+            document.getElementById('storeInfoAddress').textContent = address;
+            document.getElementById('selectedStoreInfo').style.display = 'block';
+            document.getElementById('storeButtonText').textContent = `${typeName} ${name}`;
+            
+            closeStoreMap();
+        }
+
         let cart = [];
+
 
         function filterByCategory(category) {
             currentCategory = category;
@@ -607,16 +812,17 @@
             const name = document.getElementById('customerName').value;
             const phone = document.getElementById('customerPhone').value;
             const email = document.getElementById('customerEmail').value;
-            const storeCity = document.getElementById('storeCity').value;
-            const storeName = document.getElementById('storeName').value;
-            const storeAddress = document.getElementById('storeAddress').value;
-            const storeCode = document.getElementById('storeCode').value;
-            const address = `${storeCity} - ${storeName} (${storeAddress})${storeCode ? ' [代碼:' + storeCode + ']' : ''}`;
+            const selectedStoreId = document.getElementById('selectedStoreId').value;
+            const selectedStoreName = document.getElementById('selectedStoreName').value;
+            const selectedStoreAddress = document.getElementById('selectedStoreAddress').value;
+            const selectedStoreType = document.getElementById('selectedStoreType').value;
+            const storeTypeName = selectedStoreType === '711' ? '7-ELEVEN' : '全家';
+            const address = `${storeTypeName} ${selectedStoreName} - ${selectedStoreAddress} (代號:${selectedStoreId})`;
             const account = document.getElementById('accountLast5').value;
             const note = document.getElementById('orderNote').value;
             const screenshotFile = document.getElementById('paymentScreenshot').files[0];
 
-            if (!name || !phone || !email || !storeCity || !storeName || !storeAddress || !account || !screenshotFile) {
+            if (!name || !phone || !email || !selectedStoreId || !selectedStoreName || !account || !screenshotFile) {
                 alert('請填寫所有必填欄位並上傳匯款截圖！');
                 return;
             }
@@ -697,8 +903,10 @@
                         <p><strong>姓名：</strong>${name}</p>
                         <p><strong>電話：</strong>${phone}</p>
                         <p><strong>Email：</strong>${email || '未提供'}</p>
-                        <p><strong>取貨門市：</strong>${storeCity} - ${storeName}</p>
-                        <p><strong>門市地址：</strong>${storeAddress}</p>
+                        <p><strong>取貨超商：</strong>${storeTypeName}</p>
+                        <p><strong>門市名稱：</strong>${selectedStoreName}</p>
+                        <p><strong>門市地址：</strong>${selectedStoreAddress}</p>
+                        <p><strong>門市代號：</strong>${selectedStoreId}</p>
                         <p><strong>匯款帳號後五碼：</strong>${account}</p>
                         ${note ? `<p><strong>備註：</strong>${note}</p>` : ''}
                         <hr style="margin: 15px 0;">
