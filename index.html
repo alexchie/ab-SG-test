@@ -389,8 +389,57 @@
                     <input type="email" id="customerEmail" value="@gmail.com" required>
                 </div>
                 <div class="form-group">
-                    <label>收件地址 *</label>
-                    <textarea id="customerAddress" rows="3" required></textarea>
+                    <label>配送方式 *</label>
+                    <div style="margin-bottom: 10px;">
+                        <input type="radio" id="delivery711" name="deliveryMethod" value="711" checked>
+                        <label for="delivery711" style="display: inline; font-weight: normal;">7-11 門市取貨</label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>取貨縣市 *</label>
+                    <select id="storeCity" required>
+                        <option value="">請選擇縣市</option>
+                        <option value="台北市">台北市</option>
+                        <option value="新北市">新北市</option>
+                        <option value="桃園市">桃園市</option>
+                        <option value="台中市">台中市</option>
+                        <option value="台南市">台南市</option>
+                        <option value="高雄市">高雄市</option>
+                        <option value="基隆市">基隆市</option>
+                        <option value="新竹市">新竹市</option>
+                        <option value="新竹縣">新竹縣</option>
+                        <option value="苗栗縣">苗栗縣</option>
+                        <option value="彰化縣">彰化縣</option>
+                        <option value="南投縣">南投縣</option>
+                        <option value="雲林縣">雲林縣</option>
+                        <option value="嘉義市">嘉義市</option>
+                        <option value="嘉義縣">嘉義縣</option>
+                        <option value="屏東縣">屏東縣</option>
+                        <option value="宜蘭縣">宜蘭縣</option>
+                        <option value="花蓮縣">花蓮縣</option>
+                        <option value="台東縣">台東縣</option>
+                        <option value="澎湖縣">澎湖縣</option>
+                        <option value="金門縣">金門縣</option>
+                        <option value="連江縣">連江縣</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>7-11 門市名稱 *</label>
+                    <input type="text" id="storeName" placeholder="例如：台北車站門市" required>
+                    <small style="color: #666; font-size: 0.9em;">請至 <a href="https://emap.pcsc.com.tw/" target="_blank" style="color: #0066cc;">7-11 門市查詢</a> 查詢門市資訊</small>
+                </div>
+                
+                <div class="form-group">
+                    <label>門市地址 *</label>
+                    <input type="text" id="storeAddress" placeholder="例如：台北市中正區北平西路3號" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>門市代碼（選填）</label>
+                    <input type="text" id="storeCode" placeholder="例如：123456">
+                    <small style="color: #666; font-size: 0.9em;">如果知道門市代碼可以填寫，不知道可以留空</small>
                 </div>
                 <div class="form-group">
                     <label>匯款帳號後五碼 *</label>
@@ -558,12 +607,16 @@
             const name = document.getElementById('customerName').value;
             const phone = document.getElementById('customerPhone').value;
             const email = document.getElementById('customerEmail').value;
-            const address = document.getElementById('customerAddress').value;
+            const storeCity = document.getElementById('storeCity').value;
+            const storeName = document.getElementById('storeName').value;
+            const storeAddress = document.getElementById('storeAddress').value;
+            const storeCode = document.getElementById('storeCode').value;
+            const address = `${storeCity} - ${storeName} (${storeAddress})${storeCode ? ' [代碼:' + storeCode + ']' : ''}`;
             const account = document.getElementById('accountLast5').value;
             const note = document.getElementById('orderNote').value;
             const screenshotFile = document.getElementById('paymentScreenshot').files[0];
 
-            if (!name || !phone || !email || !address || !account || !screenshotFile) {
+            if (!name || !phone || !email || !storeCity || !storeName || !storeAddress || !account || !screenshotFile) {
                 alert('請填寫所有必填欄位並上傳匯款截圖！');
                 return;
             }
@@ -644,7 +697,8 @@
                         <p><strong>姓名：</strong>${name}</p>
                         <p><strong>電話：</strong>${phone}</p>
                         <p><strong>Email：</strong>${email || '未提供'}</p>
-                        <p><strong>地址：</strong>${address}</p>
+                        <p><strong>取貨門市：</strong>${storeCity} - ${storeName}</p>
+                        <p><strong>門市地址：</strong>${storeAddress}</p>
                         <p><strong>匯款帳號後五碼：</strong>${account}</p>
                         ${note ? `<p><strong>備註：</strong>${note}</p>` : ''}
                         <hr style="margin: 15px 0;">
